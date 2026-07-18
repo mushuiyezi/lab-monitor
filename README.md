@@ -7,7 +7,7 @@
 这个项目的目标是：
 - 采集系统的 CPU 和内存使用情况
 - 将数据记录到日志文件中
-- 便于后续做实验室环境监控、性能分析或演示
+- 支持 Conda 与 Docker 两种运行方式
 
 ## 2. 快速开始（Conda 版）
 
@@ -30,13 +30,13 @@ python monitor.py
 logs/system_stats.txt
 ```
 
-### 2.3 导出环境清单
-
-如果你修改了依赖，可以执行：
+### 2.3 查看日志
 
 ```bash
-conda env export > environment.yml
+type logs\system_stats.txt
 ```
+
+如果看到类似 `CPU 12.3%, MEM 45.6%` 的记录，说明程序已正常运行。
 
 ## 3. 快速开始（Docker 版）
 
@@ -49,17 +49,13 @@ docker build -t lab-monitor:v1.0 .
 ### 3.2 运行容器
 
 ```bash
-docker run --rm -v "${PWD}/logs:/app/logs" lab-monitor:v1.0
+docker run --rm -v "%cd%\logs:/app/logs" lab-monitor:v1.0
 ```
 
 说明：
-- `-v "${PWD}/logs:/app/logs"` 会把宿主机当前目录下的 `logs` 文件夹挂载到容器中的 `/app/logs`
+- `-v "%cd%\logs:/app/logs"` 会把宿主机当前目录下的 `logs` 文件夹挂载到容器中的 `/app/logs`
 - 这样即使容器被删除，日志仍然保存在宿主机上
-- 你可以在宿主机上直接查看：
-
-```bash
-cat logs/system_stats.txt
-```
+- 运行后可直接查看宿主机上的 `logs/system_stats.txt`
 
 ## 4. Git 初始化与分支协作
 
@@ -88,11 +84,34 @@ git push -u origin dev-yourname
 ## 5. 依赖说明
 
 项目依赖文件如下：
-- [requirements.txt](requirements.txt)
-- [environment.yml](environment.yml)
+- `environment.yml`
+
+当前环境依赖：
+- `python=3.10`
+- `psutil`
+
+如果需要生成 `requirements.txt`，可以执行：
+
+```bash
+pip freeze > requirements.txt
+```
 
 ## 6. 目录说明
 
-- [monitor.py](monitor.py)：主程序
-- [Dockerfile](Dockerfile)：容器配置
-- [logs/](logs)：运行后生成的日志目录
+- `monitor.py`：主程序
+- `Dockerfile`：容器配置
+- `environment.yml`：Conda 环境配置
+- `logs/`：运行后生成的日志目录
+- `README.md`：项目说明文档
+- `test.txt`：测试文件（占位）
+
+---
+
+> GitHub 仓库地址：
+> `https://github.com/mushuiyezi/lab-monitor.git`
+
+## 9. 后续优化建议
+
+- 增加网络、磁盘和进程数据采集
+- 将日志文件改为 CSV 或 JSON 便于后续分析
+- 增加定时任务支持，实现更长时间的监控
